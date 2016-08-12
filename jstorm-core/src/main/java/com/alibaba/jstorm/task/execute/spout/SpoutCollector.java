@@ -97,8 +97,7 @@ public class SpoutCollector extends SpoutOutputCollectorCb {
 
         ackerNum = JStormUtils.parseInt(storm_conf.get(Config.TOPOLOGY_ACKER_EXECUTORS));
 
-        random = new Random();
-        random.setSeed(System.currentTimeMillis());
+        random = new Random(Utils.secureRandomLong());
 
         String componentId = topology_context.getThisComponentId();
         emitTotalTimer = (AsmHistogram) JStormMetrics.registerTaskMetric(MetricUtils.taskMetricName(
@@ -179,7 +178,7 @@ public class SpoutCollector extends SpoutOutputCollectorCb {
         try {
             boolean needAck = (message_id != null) && (ackerNum > 0);
             Long root_id = getRootId(message_id);
-            java.util.List<Integer> out_tasks = null;
+            java.util.List<Integer> out_tasks;
 
             if (out_task_id != null) {
                 out_tasks = sendTargets.get(out_task_id, out_stream_id, values, null, root_id);
@@ -191,11 +190,10 @@ public class SpoutCollector extends SpoutOutputCollectorCb {
                 return out_tasks;
             }
 
-            List<Long> ackSeq = null;
+            List<Long> ackSeq = new ArrayList<Long>();
             for (Integer t : out_tasks) {
                 MessageId msgid;
                 if (needAck) {
-                    ackSeq = new ArrayList<Long>();
                     // Long as = MessageId.generateId();
                     Long as = MessageId.generateId(random);
                     msgid = MessageId.makeRootId(root_id, as);
@@ -222,7 +220,7 @@ public class SpoutCollector extends SpoutOutputCollectorCb {
         try {
             boolean needAck = (message_id != null) && (ackerNum > 0);
             Long root_id = getRootId(message_id);
-            java.util.List<Integer> out_tasks = null;
+            java.util.List<Integer> out_tasks;
 
             if (out_task_id != null) {
                 out_tasks = sendTargets.get(out_task_id, out_stream_id, values, null, root_id);
@@ -234,11 +232,10 @@ public class SpoutCollector extends SpoutOutputCollectorCb {
                 return out_tasks;
             }
 
-            List<Long> ackSeq = null;
+            List<Long> ackSeq = new ArrayList<Long>();
             for (Integer t : out_tasks) {
                 MessageId msgid;
                 if (needAck) {
-                    ackSeq = new ArrayList<Long>();
                     // Long as = MessageId.generateId();
                     Long as = MessageId.generateId(random);
                     msgid = MessageId.makeRootId(root_id, as);
